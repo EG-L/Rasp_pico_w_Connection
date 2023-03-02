@@ -15,16 +15,18 @@ class MUX:
         self.selc = Pin(12,mode=Pin.OUT,value=self.SELC)
     
     def MUX_CHECK(self,outputV=0.0,limit=0.0,Err_check=0):#Err_check : 0 data_read, 1 err
+        
         self.err_check = Err_check
-        MNT = ADC(26)
-        MNTIN = (3.3/65536)*MNT.read_u16()
+        self.MNT = ADC(26)
+        
         if self.err_check == 0:
             self.dspon = Pin(6,mode=Pin.OUT,value=self.DSPON)
             self.trxon = Pin(7,mode=Pin.OUT,value=self.TRXON)
             self.trxcon = Pin(8,mode=Pin.OUT,value=self.TRXCON)
             time.sleep(0.5)
             while True:
-                if MNTIN>=outputV:
+                self.MNTIN = (3.3/65536)*self.MNT.read_u16()
+                if self.MNTIN>=outputV:
                     DATA = ADC(28)
                     DSPEN = (3.3/65536)*DATA.read_u16()
                     if DSPEN>=limit:
@@ -50,9 +52,15 @@ class MUX:
                     DC12VMNT = (3.3/65536)*DATA.read_u16()
                 break
             
-            return DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.err_check
+            return DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.MNTIN,self.err_check
         else:
-            return 0,0,0,0,1
+            while True:
+                self.MNTIN = (3.3/65536)*self.MNT.read_u16()
+                if self.MNTIN>=outputV:
+                    break
+                time.sleep(0.5)
+            return 0,0,0,0,self.MNTIN,1
+        
     def Break_DT(self):
         stop_dat = [self.dspon,self.trxon,self.trxcon]
         
