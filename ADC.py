@@ -1,13 +1,6 @@
-import utime
+import time
 from machine import ADC,Pin
-# pin = Pin(10,mode=Pin.OUT)
-#pin.value(1)
-# adc = ADC(2)
-# print(adc.read_u16())
-# utime.sleep(1)
-# pin.value(0)
-# adc = ADC(2)
-# print(adc.read_u16())
+
 class MUX:
     def __init__(self):
         self.SELA = 0
@@ -16,27 +9,55 @@ class MUX:
         self.DSPON = 1
         self.TRXON = 1
         self.TRXCON = 1
-        
-        self.Break_signal = 0
-        
-        Pin(10,mode=Pin.OUT,value=self.SELA)
-        Pin(11,mode=Pin.OUT,value=self.SELB)
-        Pin(12,mode=Pin.OUT,value=self.SELC)
-        
-        Pin(6,mode=Pin.OUT,value=self.DSPON)
-        Pin(7,mode=Pin.OUT,value=self.TRXON)
-        Pin(8,mode=Pin.OUT,value=self.TRXCON)
+       
+        self.sela = Pin(10,mode=Pin.OUT,value=self.SELA)
+        self.selb = Pin(11,mode=Pin.OUT,value=self.SELB)
+        self.selc = Pin(12,mode=Pin.OUT,value=self.SELC)
     
-    def MUX_CHECK(limit=0):
-        while True:
-            MNT = ADC(26)
-            MNTIN = adc.read_u16()
-            if MNTIN>=limit:
-                DSP = ADC(28)
-                DSPEN = adc.read_u16()
-                Pin(10,mode=Pin.OUT,value=1)
-                TRXPSEN = adc.read_u16()
+    def MUX_CHECK(self,outputV=0.0,limit=0.0,Err_check=0):#Err_check : 0 data_read, 1 err
+        self.err_check = Err_check
+        MNT = ADC(26)
+        MNTIN = (3.3/65536)*MNT.read_u16()
+        if self.err_check == 0:
+            self.dspon = Pin(6,mode=Pin.OUT,value=self.DSPON)
+            self.trxon = Pin(7,mode=Pin.OUT,value=self.TRXON)
+            self.trxcon = Pin(8,mode=Pin.OUT,value=self.TRXCON)
+            time.sleep(0.5)
+            while True:
+                if MNTIN>=outputV:
+                    DATA = ADC(28)
+                    DSPEN = (3.3/65536)*DATA.read_u16()
+                    if DSPEN>=limit:
+                        self.Break_DT()
+                        DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.err_check = 0,0,0,0,1
+                        break
+                    time.sleep(0.1)
+                    Pin(10,mode=Pin.OUT,value=1)
+                    TRXPSEN = (3.3/65536)*DATA.read_u16()
+                    if TRXPSEN>=limit:
+                        self.Break_DT()
+                        DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.err_check = 0,0,0,0,1
+                        break
+                    time.sleep(0.1)
+                    DATA = ADC(27)
+                    TRXCSEN = (3.3/65536)*DATA.read_u16()
+                    if TRXCSEN>=limit:
+                        self.Break_DT()
+                        DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.err_check = 0,0,0,0,1
+                        break
+                    Pin(11,mode=Pin.OUT,value=1)
+                    time.sleep(0.1)
+                    DC12VMNT = (3.3/65536)*DATA.read_u16()
+                break
+            
+            return DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.err_check
+        else:
+            return 0,0,0,0,1
+    def Break_DT(self):
+        stop_dat = [self.dspon,self.trxon,self.trxcon]
+        
+        for i in stop_dat:
+            i.value(0)
                 
-    
-    def b_Sen(self,loc):
-        return Pin(loc,mode=Pin.OUT,value=self.Break_signal)
+if __name__=='__main__':
+    print(MUX().MUX_CHECK())
