@@ -54,7 +54,7 @@ class MUX:
                     Pin(11,mode=Pin.OUT,value=1)
                     time.sleep(0.1)
                     DC12VMNT = (3.3/65536)*DATA.read_u16()
-                break
+                break #### 브레이크 수정 필요
             
             return DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.MNTIN,self.err_check
         else:
