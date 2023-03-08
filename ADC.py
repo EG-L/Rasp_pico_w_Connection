@@ -23,6 +23,10 @@ class MUX:
             self.dspon = Pin(6,mode=Pin.OUT,value=self.DSPON)
             self.trxon = Pin(7,mode=Pin.OUT,value=self.TRXON)
             self.trxcon = Pin(8,mode=Pin.OUT,value=self.TRXCON)
+            DSPEN = 0
+            TRXPSEN = 0
+            TRXCSEN = 0
+            DC12VMNT = 0
             time.sleep(0.5)
             while True:
                 self.MNTIN = (3.3/65536)*self.MNT.read_u16()
