@@ -28,7 +28,7 @@ class Uart_CONN:
                 break
         return T,D
     
-    def RS232WRITE(self,DSPEN=0,TRXEN=0,TRXCSEN=0,DC12VMNT=0,MNTIN=0,BDTEMP=0,ENVTEMP=0,PRESSURE=0,FPGAWORKING=0):
+    def RS232WRITE(self,DSPEN=0,TRXEN=0,TRXCSEN=0,DC12VMNT=0,MNTIN=0,BDTEMP=0,ENVTEMP=0,DEPTH=0,FPGAWORKING=0):
         self.tx1 = Pin(4)
         self.rx1 = Pin(5)
         self.baud = 9600
@@ -36,7 +36,7 @@ class Uart_CONN:
         self.uart2 = UART(1, baudrate=self.baud, tx=self.tx1, rx=self.rx1)
         self.uart2.init(self.baud,bits=8,parity=None,stop=1)
         
-        RSDAT = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n'%(DSPEN,TRXEN,TRXCSEN,DC12VMNT,MNTIN,BDTEMP,ENVTEMP,PRESSURE,FPGAWORKING)
+        RSDAT = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n'%(DSPEN,TRXEN,TRXCSEN,DC12VMNT,MNTIN,BDTEMP,ENVTEMP,DEPTH,FPGAWORKING)
         
         self.uart2.write(RSDAT)
         
