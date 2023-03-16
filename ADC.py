@@ -54,7 +54,7 @@ class MUX:
                     Pin(11,mode=Pin.OUT,value=1)
                     time.sleep(0.1)
                     DC12VMNT = (3.3/65536)*DATA.read_u16()
-                break #### 브레이크 들여쓰기 수정 필요
+                    break
             
             return DSPEN,TRXPSEN,TRXCSEN,DC12VMNT,self.MNTIN,self.err_check
         else:
@@ -72,4 +72,4 @@ class MUX:
             i.value(0)
                 
 if __name__=='__main__':
-    print(MUX().MUX_CHECK())
+    print(MUX().MUX_CHECK(outputV=1.0,limit=2,Err_check=0))

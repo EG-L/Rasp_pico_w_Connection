@@ -8,7 +8,7 @@ class Uart_CONN:
         self.rx1 = 0
         self.baud = 0
         
-    def RS485READ(self,tx1=Pin(0),TRX_CON=Pin(22),rx1=Pin(1),baud=115200):
+    def RS485READ(self,tx1=Pin(0),TRX_CON=Pin(22,mode=Pin.OUT),rx1=Pin(1),baud=115200):
         self.tx1 = tx1
         self.TRX_CON = TRX_CON
         self.TRX_CON.value(0)
@@ -17,14 +17,18 @@ class Uart_CONN:
         self.uart1 = UART(0, baudrate=self.baud, tx=self.tx1, rx=self.rx1)
         self.uart1.init(self.baud,bits=8,parity=None,stop=1)
         while True:
-            if self.uart1.any():
-                Data = self.uart1.read().decode().split('\r')
-                T,D = Data[0][Data[0].index('=')+1:],Data[1][Data[1].index('=')+1:]
-                time.sleep(0.1)
+            try:
+                if self.uart1.any():
+                    Data = self.uart1.read().decode().split('\r')
+                    T,D = Data[0][Data[0].index('=')+1:],Data[1][Data[1].index('=')+1:]
+                    time.sleep(0.1)
+                    break
+            except:
+                T,D = 0,0
                 break
         return T,D
     
-    def RS232WRITE(self,DSPEN=0,TRXEN=0,TRXCSEN=0,DC12VMNT=0,MINTIN=0,BDTEMP=0,ENVTEMP=0,PRESSURE=0,FPGAWORKING=0):
+    def RS232WRITE(self,DSPEN=0,TRXEN=0,TRXCSEN=0,DC12VMNT=0,MNTIN=0,BDTEMP=0,ENVTEMP=0,PRESSURE=0,FPGAWORKING=0):
         self.tx1 = Pin(4)
         self.rx1 = Pin(5)
         self.baud = 9600
@@ -32,11 +36,13 @@ class Uart_CONN:
         self.uart2 = UART(1, baudrate=self.baud, tx=self.tx1, rx=self.rx1)
         self.uart2.init(self.baud,bits=8,parity=None,stop=1)
         
-        RSDAT = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n'%(DSPEN,TRXEN,TRXCSEN,DC12VMNT,MINTIN,BDTEMP,ENVTEMP,PRESSURE,FPGAWORKING)
+        RSDAT = '%s,%s,%s,%s,%s,%s,%s,%s,%s\n'%(DSPEN,TRXEN,TRXCSEN,DC12VMNT,MNTIN,BDTEMP,ENVTEMP,PRESSURE,FPGAWORKING)
         
         self.uart2.write(RSDAT)
         
         return 0
 
-print(Uart_CONN().RS485READ())
-print(Uart_CONN().RS232WRITE())
+if __name__ == '__main__':
+    print(Uart_CONN().RS485READ())
+    print(Uart_CONN().RS232WRITE())
+

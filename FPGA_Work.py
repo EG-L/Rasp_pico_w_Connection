@@ -9,10 +9,10 @@ class FPGA_:
         self.pin = Working_set
         try:
             if self.pin.value() == 0:
-                print('Close')
+#                 print('Close')
                 return 0
             else:
-                print('Open')
+#                 print('Open')
                 return 1
         except Exception as e:
             print('Error')

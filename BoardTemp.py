@@ -16,7 +16,7 @@ class Board_temp:
                 utime.sleep(0.1)
             except:
                 TEMPDAT = 0
-                print('%s:%f'%('Celsius',0.0))
+#                 print('%s:%f'%('Celsius',0.0))
                 utime.sleep(0.1)
             break
         return TEMPDAT
