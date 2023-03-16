@@ -12,7 +12,7 @@ class Board_temp:
         while True:
             try:
                 TEMPDAT = struct.unpack(self.TEMP,self.i2c.readfrom(self.devices[0],1))[0]
-                print('%s:%.1f'%('Celsius',TEMPDAT))
+#                print('%s:%.1f'%('Celsius',TEMPDAT))
                 utime.sleep(0.1)
             except:
                 TEMPDAT = 0
